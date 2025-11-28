@@ -46,114 +46,157 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for beautiful styling
+# Custom CSS for beautiful styling - Light, minimal theme
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
+    /* Base styling - light theme */
+    .stApp {
+        background-color: #ffffff;
+    }
+    
     .main-header {
         font-family: 'Inter', sans-serif;
-        font-size: 2.8rem;
+        font-size: 2.5rem;
         font-weight: 700;
         text-align: center;
         margin-bottom: 0.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #1a1a1a;
     }
     
     .sub-header {
         font-family: 'Inter', sans-serif;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         text-align: center;
-        color: #7f8c8d;
+        color: #666666;
         margin-bottom: 2rem;
     }
     
     .type-card {
-        padding: 1.5rem;
-        border-radius: 1rem;
+        padding: 1.2rem;
+        border-radius: 8px;
         text-align: center;
         color: white;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     
-    .insight-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-        padding: 1.5rem;
-        border-radius: 1rem;
-        margin: 1rem 0;
-        border-left: 4px solid #667eea;
+    .insight-box {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+        border-left: 3px solid #1a1a1a;
     }
     
-    .gate-conscious {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 0.3rem 0.6rem;
-        border-radius: 0.3rem;
+    .gate-tag {
+        background: #f0f0f0;
+        color: #1a1a1a;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
         margin: 0.1rem;
         display: inline-block;
         font-size: 0.85rem;
-    }
-    
-    .gate-unconscious {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        color: white;
-        padding: 0.3rem 0.6rem;
-        border-radius: 0.3rem;
-        margin: 0.1rem;
-        display: inline-block;
-        font-size: 0.85rem;
-    }
-    
-    .center-defined {
-        background-color: #f39c12;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        margin: 0.2rem;
-        display: inline-block;
-    }
-    
-    .center-open {
-        background-color: #ecf0f1;
-        color: #7f8c8d;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        margin: 0.2rem;
-        display: inline-block;
-        border: 1px dashed #bdc3c7;
-    }
-    
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 1rem;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        padding: 0.75rem 1.5rem;
         font-weight: 500;
     }
     
+    .gate-list {
+        background: #f8f9fa;
+        padding: 0.8rem 1rem;
+        border-radius: 6px;
+        margin: 0.5rem 0;
+    }
+    
     .practice-box {
-        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-        padding: 1.5rem;
-        border-radius: 1rem;
-        margin: 1rem 0;
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+        color: #166534;
     }
     
     .warning-box {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        padding: 1.5rem;
-        border-radius: 1rem;
-        margin: 1rem 0;
+        background: #fef3c7;
+        border: 1px solid #fcd34d;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+        color: #92400e;
+    }
+    
+    .info-box {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+        color: #1e40af;
+    }
+    
+    .center-defined {
+        background-color: #1a1a1a;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        margin: 0.2rem;
+        display: inline-block;
+        font-size: 0.85rem;
+    }
+    
+    .center-open {
+        background-color: #f0f0f0;
+        color: #666;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        margin: 0.2rem;
+        display: inline-block;
+        font-size: 0.85rem;
+        border: 1px solid #e0e0e0;
+    }
+    
+    /* Compact spacing */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    /* Clean expanders */
+    .streamlit-expanderHeader {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background-color: #f8f9fa;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.5rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Dataframe styling */
+    .dataframe {
+        font-size: 0.85rem;
+    }
+    
+    /* Hide excessive padding */
+    .element-container {
+        margin-bottom: 0.5rem;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Header
-st.markdown('<div class="main-header">✨ Human Design Calculator</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Discover Your Unique Energetic Blueprint</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Human Design Calculator</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Discover your energetic blueprint</div>', unsafe_allow_html=True)
 
 # Sidebar for navigation
 with st.sidebar:
@@ -295,11 +338,11 @@ if page == "📊 Calculate Chart":
         col1, col2, col3, col4 = st.columns(4)
         
         type_colors = {
-            "Generator": "#27ae60",
-            "Manifesting Generator": "#e67e22",
-            "Manifestor": "#8e44ad",
-            "Projector": "#3498db",
-            "Reflector": "#95a5a6"
+            "Generator": "#22c55e",
+            "Manifesting Generator": "#f97316",
+            "Manifestor": "#8b5cf6",
+            "Projector": "#3b82f6",
+            "Reflector": "#6b7280"
         }
         
         hd_type = analysis['type']
@@ -307,33 +350,32 @@ if page == "📊 Calculate Chart":
         with col1:
             st.markdown(f"""
             <div class="type-card" style="background: {type_colors.get(hd_type, '#333')};">
-                <h4 style="margin: 0; opacity: 0.9;">Type</h4>
-                <h2 style="margin: 0.5rem 0;">{hd_type}</h2>
+                <p style="margin: 0; opacity: 0.9; font-size: 0.8rem;">Type</p>
+                <p style="margin: 0.3rem 0; font-size: 1.3rem; font-weight: 600;">{hd_type}</p>
             </div>
             """, unsafe_allow_html=True)
         
         with col2:
             st.markdown(f"""
-            <div class="type-card" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);">
-                <h4 style="margin: 0; opacity: 0.9;">Profile</h4>
-                <h2 style="margin: 0.5rem 0;">{analysis['profile']}</h2>
-                <p style="margin: 0; font-size: 0.8rem; opacity: 0.8;">{get_profile_name(analysis['profile'])}</p>
+            <div class="type-card" style="background: #1f2937;">
+                <p style="margin: 0; opacity: 0.9; font-size: 0.8rem;">Profile</p>
+                <p style="margin: 0.3rem 0; font-size: 1.3rem; font-weight: 600;">{analysis['profile']}</p>
             </div>
             """, unsafe_allow_html=True)
         
         with col3:
             st.markdown(f"""
-            <div class="type-card" style="background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);">
-                <h4 style="margin: 0; opacity: 0.9;">Authority</h4>
-                <h2 style="margin: 0.5rem 0;">{analysis['authority']}</h2>
+            <div class="type-card" style="background: #dc2626;">
+                <p style="margin: 0; opacity: 0.9; font-size: 0.8rem;">Authority</p>
+                <p style="margin: 0.3rem 0; font-size: 1.3rem; font-weight: 600;">{analysis['authority']}</p>
             </div>
             """, unsafe_allow_html=True)
         
         with col4:
             st.markdown(f"""
-            <div class="type-card" style="background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);">
-                <h4 style="margin: 0; opacity: 0.9;">Definition</h4>
-                <h2 style="margin: 0.5rem 0;">{analysis['definition']}</h2>
+            <div class="type-card" style="background: #0891b2;">
+                <p style="margin: 0; opacity: 0.9; font-size: 0.8rem;">Definition</p>
+                <p style="margin: 0.3rem 0; font-size: 1.3rem; font-weight: 600;">{analysis['definition']}</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -621,157 +663,110 @@ if page == "📊 Calculate Chart":
                 st.success(evening_q)
 
 elif page == "🌙 Daily Transits":
-    st.markdown("## 🌙 Current Transits & Daily Guidance")
+    st.markdown("## Today's Transit Reading")
     
-    col1, col2 = st.columns(2)
-    
+    # Simple time controls in one line
+    col1, col2, col3 = st.columns([2, 2, 1])
     with col1:
-        use_current = st.checkbox("Use current time", value=True)
-        
-        if not use_current:
-            transit_date = st.date_input("Transit Date", value=date.today(), key="transit_date")
-            transit_time = st.time_input("Transit Time", value=datetime.now().time(), key="transit_time")
-        else:
-            transit_date = date.today()
-            transit_time = datetime.now().time()
-    
+        transit_date = st.date_input("Date", value=date.today(), key="transit_date", label_visibility="collapsed")
     with col2:
-        transit_tz = st.selectbox(
-            "Timezone",
-            options=pytz.common_timezones,
-            index=pytz.common_timezones.index('UTC') if 'UTC' in pytz.common_timezones else 0
-        )
+        transit_tz = st.selectbox("Timezone", options=['UTC', 'America/New_York', 'America/Los_Angeles', 'Europe/London', 'Europe/Athens', 'Europe/Paris', 'Asia/Tokyo'], index=0, label_visibility="collapsed")
     
-    # Auto-calculate on page load
-    transit_datetime = datetime.combine(transit_date, transit_time)
+    # Auto-calculate
+    transit_datetime = datetime.combine(transit_date, datetime.now().time())
     transit = calculate_transit_chart(transit_datetime, transit_tz)
-    st.session_state['transit'] = transit
     
-    st.markdown("---")
-    
-    # Today's Theme - Sun Gate
+    # Get transit gates
     sun_data = transit['gates'].get('Sun', {})
     sun_gate = sun_data.get('gate', 1)
-    sun_line = sun_data.get('line', 1)
     sun_info = get_gate_insights(sun_gate)
     
-    st.markdown(f"## ☀️ Today's Theme: Gate {sun_gate}.{sun_line} - {sun_info['name']}")
-    st.write(sun_info['description'])
-    st.caption(f"**I Ching Theme:** {sun_info['theme']}")
+    moon_data = transit['gates'].get('Moon', {})
+    moon_gate = moon_data.get('gate', 1)
+    moon_info = get_gate_insights(moon_gate)
+    
+    # Today's theme - compact
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"### ☀️ Sun: Gate {sun_gate} - {sun_info['name']}")
+        st.caption(f"{sun_info['description']}")
+    with col2:
+        st.markdown(f"### 🌙 Moon: Gate {moon_gate} - {moon_info['name']}")
+        st.caption(f"{moon_info['description']}")
     
     st.markdown("---")
     
-    # If user has a chart, show personalized insights
+    # If user has chart - show personalized reading
     if 'analysis' in st.session_state:
         analysis = st.session_state['analysis']
         hd_type = analysis['type']
         natal_gates = set(analysis.get('all_gates', []))
         transit_gate_nums = set(data['gate'] for data in transit['gates'].values())
         
-        activating = transit_gate_nums & natal_gates
-        new_gates = transit_gate_nums - natal_gates
+        activating = sorted(transit_gate_nums & natal_gates)
+        new_gates = sorted(transit_gate_nums - natal_gates)
         
-        st.markdown("## 🎯 Your Personalized Transit Reading")
-        
+        # Compact two-column layout
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("### 🔥 Gates Being Amplified")
+            st.markdown("### 🔥 Your Gates Activated")
             if activating:
-                st.success(f"**{', '.join(map(str, sorted(activating)))}**")
-                st.write("These gates in your chart are receiving extra energy today. You may feel these themes more strongly.")
-                
-                for gate in list(activating)[:3]:
-                    gate_info = get_gate_insights(gate)
-                    with st.expander(f"Gate {gate} - {gate_info['name']}"):
-                        st.write(gate_info['description'])
-                        st.caption(f"Theme: {gate_info['theme']}")
+                # Show as compact list with inline descriptions
+                for gate in activating:
+                    info = get_gate_insights(gate)
+                    st.markdown(f"**{gate}** · {info['name']} — *{info['theme']}*")
             else:
-                st.info("No direct gate activations today - a quieter day for your chart.")
-            
-            st.markdown("---")
-            
-            # Moon insight
-            moon_data = transit['gates'].get('Moon', {})
-            moon_gate = moon_data.get('gate', 1)
-            moon_info = get_gate_insights(moon_gate)
-            st.markdown("### 🌙 Emotional Undercurrent")
-            st.markdown(f"**Gate {moon_gate} - {moon_info['name']}**")
-            st.write(f"The Moon brings an emotional flavor of *{moon_info['theme'].lower()}* today. You may notice feelings and moods around this theme.")
+                st.caption("No direct activations today")
         
         with col2:
-            st.markdown("### 🌟 Collective Field Today")
+            st.markdown("### 🌐 Collective Field")
             if new_gates:
-                st.info(f"**{', '.join(map(str, sorted(new_gates)))}**")
-                st.write("These gates aren't in your natal chart but are active in the collective. You may encounter these energies through others.")
-                
-                for gate in list(new_gates)[:2]:
-                    gate_info = get_gate_insights(gate)
-                    with st.expander(f"Gate {gate} - {gate_info['name']} (Collective)"):
-                        st.write(gate_info['description'])
+                # Show as compact list with inline descriptions
+                for gate in new_gates:
+                    info = get_gate_insights(gate)
+                    st.markdown(f"**{gate}** · {info['name']} — *{info['theme']}*")
             else:
-                st.success("All transit gates are in your chart today - you're aligned with the collective energy!")
-            
-            st.markdown("---")
-            
-            # Mercury insight (communication)
-            mercury_data = transit['gates'].get('Mercury', {})
-            mercury_gate = mercury_data.get('gate', 1)
-            mercury_info = get_gate_insights(mercury_gate)
-            st.markdown("### 💬 Communication Theme")
-            st.markdown(f"**Gate {mercury_gate} - {mercury_info['name']}**")
-            st.write(f"Mercury in Gate {mercury_gate} influences how ideas flow today. Conversations may center around *{mercury_info['theme'].lower()}*.")
+                st.caption("All transits are in your chart!")
         
         st.markdown("---")
         
-        # Type-specific guidance
-        st.markdown(f"## 🧘 Today's Practice for {hd_type}s")
+        # Type-specific guidance - very compact
+        st.markdown(f"### 📋 Today's Practice for {hd_type}s")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("### 🌅 Morning Intention")
             morning = get_transit_morning_practice(hd_type, sun_gate, activating)
-            st.markdown(f'<div class="practice-box">{morning}</div>', unsafe_allow_html=True)
-            
-            st.markdown("### 🎯 Focus for Today")
-            focus = get_transit_focus(hd_type, analysis['authority'], sun_gate)
-            st.info(focus)
+            st.markdown(f'<div class="practice-box"><strong>Morning:</strong> {morning}</div>', unsafe_allow_html=True)
         
         with col2:
-            st.markdown("### ⚠️ Watch Out For")
             not_self = get_not_self_guidance(hd_type)
             warning = get_transit_warning(hd_type, new_gates, not_self)
-            st.markdown(f'<div class="warning-box">{warning}</div>', unsafe_allow_html=True)
-            
-            st.markdown("### 🌙 Evening Reflection")
-            evening = get_transit_evening_question(hd_type, analysis['authority'], activating)
-            st.success(evening)
-    
+            st.markdown(f'<div class="warning-box"><strong>Watch for:</strong> {warning}</div>', unsafe_allow_html=True)
+        
+        # Evening question - single line
+        evening = get_transit_evening_question(hd_type, analysis['authority'], activating)
+        st.markdown(f'<div class="info-box"><strong>Evening reflection:</strong> {evening}</div>', unsafe_allow_html=True)
+        
     else:
-        st.markdown("---")
-        st.info("💡 **Calculate your natal chart first** to see personalized transit insights!")
-        st.markdown("Go to 'Calculate Chart' to enter your birth data, then return here for daily guidance tailored to your design.")
+        st.markdown('<div class="info-box">💡 Calculate your chart first to see personalized transit insights.</div>', unsafe_allow_html=True)
     
-    st.markdown("---")
-    
-    # Always show the transit table
-    st.markdown("### 📊 All Current Planetary Positions")
-    transit_data = create_gate_table(transit['gates'])
-    st.dataframe(
-        pd.DataFrame(transit_data)[['Planet', 'Gate.Line', 'Longitude']],
-        hide_index=True,
-        use_container_width=True
-    )
+    # Collapsible full transit table
+    with st.expander("📊 All Planetary Positions"):
+        transit_data = create_gate_table(transit['gates'])
+        st.dataframe(
+            pd.DataFrame(transit_data)[['Planet', 'Gate.Line', 'Longitude']],
+            hide_index=True,
+            use_container_width=True,
+            height=200
+        )
 
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: #7f8c8d; padding: 1rem;">
-    <p>✨ Human Design Calculator using Swiss Ephemeris</p>
-    <p style="font-size: 0.8rem;">Calculations based on planetary positions at time of birth</p>
-    <p style="font-size: 0.7rem; margin-top: 1rem;">
-        Human Design is a tool for self-discovery. This is not meant to limit you, but to help you understand your unique nature.
-    </p>
+<div style="text-align: center; color: #9ca3af; padding: 1rem; font-size: 0.8rem;">
+    Human Design Calculator · Built with Swiss Ephemeris
 </div>
 """, unsafe_allow_html=True)
