@@ -1,0 +1,10 @@
+# Human Design Calculator Dependencies
+# Alternative requirements without pyswisseph (for Python 3.13+ or compilation issues)
+
+streamlit>=1.28.0
+flatlib>=0.2.3
+plotly>=5.18.0
+pandas>=2.0.0
+pytz>=2023.3
+geopy>=2.4.1
+timezonefinder>=6.2.0

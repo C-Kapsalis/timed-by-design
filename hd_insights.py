@@ -911,3 +911,105 @@ def get_daily_practice(hd_type, authority):
         base_practice["evening"] += " Track your emotional wave. What decisions are you still processing?"
     
     return base_practice
+
+
+# ==================== TRANSIT-BASED INSIGHTS ====================
+
+def get_transit_morning_practice(hd_type, sun_gate, activating_gates):
+    """Generate morning practice based on type and today's transits."""
+    gate_info = GATE_INSIGHTS.get(sun_gate, {"name": "Unknown", "theme": "unknown"})
+    
+    type_intros = {
+        "Generator": f"As a Generator, today's Sun in Gate {sun_gate} ({gate_info['name']}) invites you to notice what sparks your Sacral response.",
+        "Manifesting Generator": f"MG energy today with Sun in Gate {sun_gate} ({gate_info['name']}) - stay alert for multiple things lighting you up. Remember to respond first, then inform.",
+        "Projector": f"Today's Sun in Gate {sun_gate} ({gate_info['name']}) may bring invitations related to {gate_info['theme'].lower()}. Wait for recognition before sharing your insights.",
+        "Manifestor": f"Gate {sun_gate} ({gate_info['name']}) energy today supports initiation around {gate_info['theme'].lower()}. Inform those who will be impacted.",
+        "Reflector": f"Sample today's Gate {sun_gate} energy ({gate_info['name']}) and notice how it feels in different environments."
+    }
+    
+    practice = type_intros.get(hd_type, type_intros["Generator"])
+    
+    if activating_gates:
+        practice += f" Your gates {', '.join(map(str, list(activating_gates)[:3]))} are being activated - these themes are amplified for you today."
+    
+    return practice
+
+
+def get_transit_focus(hd_type, authority, sun_gate):
+    """Generate daily focus based on type, authority, and sun transit."""
+    gate_info = GATE_INSIGHTS.get(sun_gate, {"name": "Unknown", "theme": "unknown"})
+    
+    authority_focus = {
+        "Emotional": f"With {gate_info['theme']} themes present, wait for emotional clarity before any decisions. Notice how your wave moves today.",
+        "Sacral": f"Let your gut guide you through Gate {sun_gate} themes. Listen for the 'uh-huh' or 'uhn-uhn' in situations involving {gate_info['theme'].lower()}.",
+        "Splenic": f"Your intuition may speak about {gate_info['theme'].lower()} today. Trust those instant hits - they won't repeat.",
+        "Ego": f"Ask yourself if your heart is truly in anything related to {gate_info['theme'].lower()} before committing.",
+        "Self-Projected": f"Talk through any {gate_info['theme'].lower()} matters with trusted allies. Your truth will emerge through speaking.",
+        "Mental": f"Notice your environment's health today. {gate_info['theme']} themes work best in the right setting.",
+        "Lunar": f"You're sampling Gate {sun_gate}'s energy today. Notice how {gate_info['theme'].lower()} feels without committing to anything major."
+    }
+    
+    return authority_focus.get(authority, authority_focus["Sacral"])
+
+
+def get_transit_warning(hd_type, new_gates, not_self_info):
+    """Generate warning based on type and transiting gates not in natal chart."""
+    base_warning = not_self_info['signs'][0] if not_self_info['signs'] else "Going against your design"
+    
+    type_warnings = {
+        "Generator": f"Watch for: {base_warning}. With gates {', '.join(map(str, list(new_gates)[:3]))} transiting (not in your chart), you may feel pulled to initiate rather than respond.",
+        "Manifesting Generator": f"Watch for: {base_warning}. The transiting gates may tempt you to skip your Sacral response. Respond first, then move fast.",
+        "Projector": f"Watch for: {base_warning}. Transiting gates may create pressure to prove yourself. Wait for genuine recognition.",
+        "Manifestor": f"Watch for: {base_warning}. The collective transit energy isn't yours to carry. Initiate what's truly yours and rest.",
+        "Reflector": f"Watch for: {base_warning}. Today's transits aren't your fixed energy - don't mistake sampled energy for who you are."
+    }
+    
+    return type_warnings.get(hd_type, type_warnings["Generator"])
+
+
+def get_transit_evening_question(hd_type, authority, activating_gates):
+    """Generate evening reflection question based on type, authority, and activated gates."""
+    
+    type_questions = {
+        "Generator": "Did I feel satisfaction today? When did my Sacral light up vs. when did I override it?",
+        "Manifesting Generator": "Did I respond before acting? Did I inform? When did frustration arise?",
+        "Projector": "Was I recognized today? Did I wait for invitations? Where did I feel bitterness?",
+        "Manifestor": "Did I inform before acting? Where did I encounter resistance vs. flow?",
+        "Reflector": "What did I sample today? Which environments felt healthy? What surprised me?"
+    }
+    
+    base_q = type_questions.get(hd_type, type_questions["Generator"])
+    
+    if activating_gates:
+        gates_str = ', '.join(map(str, list(activating_gates)[:2]))
+        base_q += f" How did Gates {gates_str} show up in my experience?"
+    
+    return base_q
+
+
+def get_transit_channel_insights(natal_gates, transit_gates):
+    """Check if transits complete any channels with natal gates."""
+    from hd_bodygraph import CHANNELS
+    
+    potential_channels = []
+    
+    for channel_key, channel_data in CHANNELS.items():
+        gate1, gate2 = channel_data['gates']
+        
+        # Check if natal has one gate and transit has the other
+        if gate1 in natal_gates and gate2 in transit_gates:
+            potential_channels.append({
+                'channel': channel_key,
+                'name': channel_data['name'],
+                'natal_gate': gate1,
+                'transit_gate': gate2
+            })
+        elif gate2 in natal_gates and gate1 in transit_gates:
+            potential_channels.append({
+                'channel': channel_key,
+                'name': channel_data['name'],
+                'natal_gate': gate2,
+                'transit_gate': gate1
+            })
+    
+    return potential_channels

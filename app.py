@@ -31,7 +31,11 @@ from hd_insights import (
     get_channel_insights,
     get_gate_insights,
     get_not_self_guidance,
-    get_daily_practice
+    get_daily_practice,
+    get_transit_morning_practice,
+    get_transit_focus,
+    get_transit_warning,
+    get_transit_evening_question
 )
 
 # Page configuration
@@ -156,7 +160,7 @@ with st.sidebar:
     st.markdown("### 🧭 Navigation")
     page = st.radio(
         "Choose a section:",
-        ["📊 Calculate Chart", "📖 Learn More", "🌙 Daily Transits"],
+        ["📊 Calculate Chart", "🌙 Daily Transits"],
         label_visibility="collapsed"
     )
     
@@ -346,11 +350,10 @@ if page == "📊 Calculate Chart":
             st.metric("⚠️ Not-Self Theme", NOT_SELF_THEME.get(hd_type, "Unknown"))
         
         # Tabs for detailed information
-        tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        tab1, tab2, tab3, tab4 = st.tabs([
             "🎨 Bodygraph", 
             "💫 Type & Authority", 
             "🔮 Gates & Channels", 
-            "🧘 Centers",
             "📝 Daily Practice"
         ])
         
@@ -524,196 +527,101 @@ if page == "📊 Calculate Chart":
                     st.caption(f"Theme: {gate_info['theme']}")
         
         with tab4:
-            st.markdown("### 🧘 Understanding Your Centers")
+            st.markdown("### 📝 Today's Practice Based on Current Transits")
             
-            all_centers = ['Head', 'Ajna', 'Throat', 'G', 'Heart', 'Sacral', 'Spleen', 'Solar Plexus', 'Root']
+            # Calculate current transits
+            from datetime import datetime
+            current_transit = calculate_transit_chart(datetime.now(), 'UTC')
+            transit_gates = current_transit['gates']
             
-            for center in all_centers:
-                is_defined = center in analysis['defined_centers']
-                center_insights = get_center_insights(center, is_defined)
-                
-                status = "🟡 Defined" if is_defined else "⚪ Open"
-                
-                with st.expander(f"**{center} Center** - {status}", expanded=False):
-                    st.write(center_insights['description'])
-                    
-                    if is_defined:
-                        st.markdown("**Your Fixed Energy:**")
-                        st.write(center_insights['defined_meaning'])
-                    else:
-                        st.markdown("**Your Wisdom Potential:**")
-                        st.write(center_insights['open_meaning'])
-                        
-                        st.markdown("**Not-Self Question:**")
-                        st.info(center_insights['not_self_question'])
-                        
-                        st.markdown("**Wisdom When Aligned:**")
-                        st.success(center_insights['wisdom'])
-        
-        with tab5:
-            st.markdown("### 📝 Your Daily Practice")
+            # Get natal gates
+            natal_gates = set(analysis.get('all_gates', []))
+            transit_gate_nums = set(data['gate'] for data in transit_gates.values())
             
-            practice = get_daily_practice(hd_type, analysis['authority'])
+            # Find activating and new gates
+            activating_gates = transit_gate_nums & natal_gates
+            new_gates = transit_gate_nums - natal_gates
+            
+            # Get today's Sun gate for theme
+            sun_transit = transit_gates.get('Sun', {})
+            today_sun_gate = sun_transit.get('gate', 1)
+            today_sun_line = sun_transit.get('line', 1)
             
             col1, col2 = st.columns(2)
             
             with col1:
-                st.markdown("#### 🌅 Morning Practice")
-                st.markdown('<div class="practice-box">', unsafe_allow_html=True)
-                st.write(practice['morning'])
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown("### ☀️ Today's Energy Theme")
+                today_gate_info = get_gate_insights(today_sun_gate)
+                st.markdown(f"**Gate {today_sun_gate}.{today_sun_line} - {today_gate_info['name']}**")
+                st.write(today_gate_info['description'])
                 
-                st.markdown("#### 🌙 Evening Reflection")
-                st.markdown('<div class="practice-box">', unsafe_allow_html=True)
-                st.write(practice['evening'])
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown("---")
+                
+                st.markdown("### 🔥 Transits Activating Your Chart")
+                if activating_gates:
+                    st.success(f"These gates are being amplified today: **{', '.join(map(str, sorted(activating_gates)))}**")
+                    
+                    # Show insights for key activating gates
+                    for gate_num in list(activating_gates)[:3]:  # Show top 3
+                        gate_info = get_gate_insights(gate_num)
+                        with st.expander(f"Gate {gate_num} - {gate_info['name']}"):
+                            st.write(gate_info['description'])
+                            st.caption(f"Theme: {gate_info['theme']}")
+                else:
+                    st.info("No direct gate activations today - a day for reflection.")
             
             with col2:
-                st.markdown("#### ⚠️ Not-Self Awareness")
-                not_self = get_not_self_guidance(hd_type)
-                st.markdown('<div class="warning-box">', unsafe_allow_html=True)
-                st.markdown("**Signs you're in your Not-Self:**")
-                for sign in not_self['signs']:
-                    st.write(f"• {sign}")
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown("### 🌟 New Energies Available Today")
+                if new_gates:
+                    st.info(f"These gates are transiting but not in your chart: **{', '.join(map(str, sorted(new_gates)))}**")
+                    st.caption("You may feel these energies from others or the collective field.")
+                    
+                    # Show insights for a couple new gates
+                    for gate_num in list(new_gates)[:2]:
+                        gate_info = get_gate_insights(gate_num)
+                        with st.expander(f"Gate {gate_num} - {gate_info['name']} (Transit)"):
+                            st.write(gate_info['description'])
+                else:
+                    st.success("All transit gates are in your chart - you're in your element!")
                 
-                st.markdown("**How to Return to Self:**")
-                for tip in not_self['return_to_self']:
-                    st.write(f"✨ {tip}")
+                st.markdown("---")
+                
+                # Moon gate for emotional theme
+                moon_transit = transit_gates.get('Moon', {})
+                moon_gate = moon_transit.get('gate', 1)
+                moon_info = get_gate_insights(moon_gate)
+                st.markdown("### 🌙 Emotional Undercurrent")
+                st.markdown(f"**Gate {moon_gate} - {moon_info['name']}**")
+                st.write(f"The Moon in Gate {moon_gate} colors today's emotional landscape with themes of {moon_info['theme'].lower()}.")
             
             st.markdown("---")
             
-            st.markdown("#### 📌 Weekly Experiment")
-            st.info(practice['weekly_experiment'])
+            # Personalized daily practice based on type + transits
+            st.markdown("### 🧘 Your Personalized Practice for Today")
             
-            st.markdown("#### 🎯 Monthly Focus")
-            st.success(practice['monthly_focus'])
-
-elif page == "📖 Learn More":
-    st.markdown("## 📖 Understanding Human Design")
-    
-    st.markdown("""
-    Human Design is a synthesis of ancient wisdom and modern science, combining:
-    - **Astrology** (planetary positions at birth)
-    - **I Ching** (64 hexagrams = 64 gates)
-    - **Kabbalah** (Tree of Life = centers and channels)
-    - **Hindu-Brahmin Chakra System** (energy centers)
-    - **Quantum Physics** (neutrino stream imprinting)
-    """)
-    
-    tab1, tab2, tab3, tab4 = st.tabs(["Types", "Authorities", "Centers", "Profiles"])
-    
-    with tab1:
-        st.markdown("### The 5 Types")
-        
-        types_data = {
-            "Generator": {
-                "percent": "~37%",
-                "strategy": "Wait to Respond",
-                "signature": "Satisfaction",
-                "not_self": "Frustration",
-                "description": "Generators are the life force of the planet. They have sustainable energy and are here to find work they love."
-            },
-            "Manifesting Generator": {
-                "percent": "~33%",
-                "strategy": "Wait to Respond, then Inform",
-                "signature": "Satisfaction",
-                "not_self": "Frustration & Anger",
-                "description": "MGs are multi-passionate beings who move quickly. They're here to find shortcuts and do multiple things."
-            },
-            "Projector": {
-                "percent": "~20%",
-                "strategy": "Wait for Invitation",
-                "signature": "Success",
-                "not_self": "Bitterness",
-                "description": "Projectors are natural guides and managers. They see others deeply and are here to guide energy."
-            },
-            "Manifestor": {
-                "percent": "~8%",
-                "strategy": "Inform before Acting",
-                "signature": "Peace",
-                "not_self": "Anger",
-                "description": "Manifestors are here to initiate and impact. They have a powerful aura that repels and closes off."
-            },
-            "Reflector": {
-                "percent": "~1%",
-                "strategy": "Wait a Lunar Cycle",
-                "signature": "Surprise",
-                "not_self": "Disappointment",
-                "description": "Reflectors are the mirrors of society. With no defined centers, they sample and reflect the health of their community."
-            }
-        }
-        
-        for type_name, info in types_data.items():
-            with st.expander(f"**{type_name}** ({info['percent']} of population)"):
-                st.write(info['description'])
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Strategy", info['strategy'])
-                with col2:
-                    st.metric("Signature", info['signature'])
-                with col3:
-                    st.metric("Not-Self", info['not_self'])
-    
-    with tab2:
-        st.markdown("### The 7 Authorities")
-        
-        authorities = {
-            "Emotional": "Wait through your emotional wave before making decisions. Clarity comes with time, never in the moment.",
-            "Sacral": "Trust your gut response - the 'uh-huh' (yes) or 'uhn-uhn' (no). Your body knows before your mind.",
-            "Splenic": "Trust your instant intuitive hits. Your spleen speaks once, in the moment - don't second-guess it.",
-            "Ego": "Ask yourself 'Do I want this? Is my heart in it?' Your willpower guides correct decisions.",
-            "Self-Projected": "Talk things out with trusted others. Your truth emerges through your voice.",
-            "Mental": "You need to be in the right environment and talk to the right people. Your authority is external.",
-            "Lunar": "Wait 28 days (full lunar cycle) before major decisions. Sample all the lunar energies first."
-        }
-        
-        for auth, desc in authorities.items():
-            with st.expander(f"**{auth} Authority**"):
-                st.write(desc)
-    
-    with tab3:
-        st.markdown("### The 9 Centers")
-        
-        centers_info = {
-            "Head": "Pressure for inspiration and questions. Open: Easily overwhelmed by others' questions.",
-            "Ajna": "Mental processing and conceptualization. Open: Can see all perspectives.",
-            "Throat": "Communication and manifestation. Open: Pressure to speak or prove oneself.",
-            "G/Identity": "Love, direction, and identity. Open: Searching for love and direction.",
-            "Heart/Ego": "Willpower and self-worth. Open: Nothing to prove.",
-            "Sacral": "Life force and work energy. Open: Not here to work in traditional ways.",
-            "Spleen": "Intuition, health, and survival. Open: Can deeply attune to wellness.",
-            "Solar Plexus": "Emotions and feelings. Open: Amplifies others' emotions.",
-            "Root": "Adrenaline and pressure. Open: Rushing to be free of pressure."
-        }
-        
-        for center, info in centers_info.items():
-            with st.expander(f"**{center} Center**"):
-                st.write(info)
-    
-    with tab4:
-        st.markdown("### The 12 Profiles")
-        
-        profiles = {
-            "1/3": "Investigator/Martyr - Foundation through trial and error",
-            "1/4": "Investigator/Opportunist - Deep research meets networking",
-            "2/4": "Hermit/Opportunist - Natural talent recognized by others",
-            "2/5": "Hermit/Heretic - Called out to save the day",
-            "3/5": "Martyr/Heretic - Learning through experience to help others",
-            "3/6": "Martyr/Role Model - Experimentation leading to wisdom",
-            "4/6": "Opportunist/Role Model - Building networks and modeling the way",
-            "4/1": "Opportunist/Investigator - Fixed foundation through relationships",
-            "5/1": "Heretic/Investigator - Practical solutions built on research",
-            "5/2": "Heretic/Hermit - Called to share natural gifts",
-            "6/2": "Role Model/Hermit - Three-part life journey",
-            "6/3": "Role Model/Martyr - Optimism through experience"
-        }
-        
-        for profile, desc in profiles.items():
-            st.write(f"**{profile}**: {desc}")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("#### 🌅 Morning Intention")
+                morning_practice = get_transit_morning_practice(hd_type, today_sun_gate, activating_gates)
+                st.markdown(f'<div class="practice-box">{morning_practice}</div>', unsafe_allow_html=True)
+                
+                st.markdown("#### 🎯 Today's Focus")
+                focus = get_transit_focus(hd_type, analysis['authority'], today_sun_gate)
+                st.info(focus)
+            
+            with col2:
+                st.markdown("#### ⚠️ Watch Out For")
+                not_self = get_not_self_guidance(hd_type)
+                warning = get_transit_warning(hd_type, new_gates, not_self)
+                st.markdown(f'<div class="warning-box">{warning}</div>', unsafe_allow_html=True)
+                
+                st.markdown("#### 🌙 Evening Question")
+                evening_q = get_transit_evening_question(hd_type, analysis['authority'], activating_gates)
+                st.success(evening_q)
 
 elif page == "🌙 Daily Transits":
-    st.markdown("## 🌙 Current Transits")
+    st.markdown("## 🌙 Current Transits & Daily Guidance")
     
     col1, col2 = st.columns(2)
     
@@ -734,55 +642,127 @@ elif page == "🌙 Daily Transits":
             index=pytz.common_timezones.index('UTC') if 'UTC' in pytz.common_timezones else 0
         )
     
-    calc_transit_btn = st.button("🔄 Calculate Current Transits", type="primary")
+    # Auto-calculate on page load
+    transit_datetime = datetime.combine(transit_date, transit_time)
+    transit = calculate_transit_chart(transit_datetime, transit_tz)
+    st.session_state['transit'] = transit
     
-    if calc_transit_btn or use_current:
-        transit_datetime = datetime.combine(transit_date, transit_time)
-        
-        with st.spinner("Calculating current transits..."):
-            transit = calculate_transit_chart(transit_datetime, transit_tz)
-            st.session_state['transit'] = transit
+    st.markdown("---")
     
-    if 'transit' in st.session_state:
-        transit = st.session_state['transit']
+    # Today's Theme - Sun Gate
+    sun_data = transit['gates'].get('Sun', {})
+    sun_gate = sun_data.get('gate', 1)
+    sun_line = sun_data.get('line', 1)
+    sun_info = get_gate_insights(sun_gate)
+    
+    st.markdown(f"## ☀️ Today's Theme: Gate {sun_gate}.{sun_line} - {sun_info['name']}")
+    st.write(sun_info['description'])
+    st.caption(f"**I Ching Theme:** {sun_info['theme']}")
+    
+    st.markdown("---")
+    
+    # If user has a chart, show personalized insights
+    if 'analysis' in st.session_state:
+        analysis = st.session_state['analysis']
+        hd_type = analysis['type']
+        natal_gates = set(analysis.get('all_gates', []))
+        transit_gate_nums = set(data['gate'] for data in transit['gates'].values())
         
-        st.markdown("---")
-        st.subheader(f"Transits for {transit['datetime'].strftime('%B %d, %Y at %H:%M')}")
+        activating = transit_gate_nums & natal_gates
+        new_gates = transit_gate_nums - natal_gates
         
-        transit_data = create_gate_table(transit['gates'])
+        st.markdown("## 🎯 Your Personalized Transit Reading")
         
-        col1, col2 = st.columns([1, 1])
+        col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("### Current Transit Gates")
-            st.dataframe(
-                pd.DataFrame(transit_data)[['Planet', 'Gate.Line', 'Longitude']],
-                hide_index=True,
-                use_container_width=True
-            )
+            st.markdown("### 🔥 Gates Being Amplified")
+            if activating:
+                st.success(f"**{', '.join(map(str, sorted(activating)))}**")
+                st.write("These gates in your chart are receiving extra energy today. You may feel these themes more strongly.")
+                
+                for gate in list(activating)[:3]:
+                    gate_info = get_gate_insights(gate)
+                    with st.expander(f"Gate {gate} - {gate_info['name']}"):
+                        st.write(gate_info['description'])
+                        st.caption(f"Theme: {gate_info['theme']}")
+            else:
+                st.info("No direct gate activations today - a quieter day for your chart.")
+            
+            st.markdown("---")
+            
+            # Moon insight
+            moon_data = transit['gates'].get('Moon', {})
+            moon_gate = moon_data.get('gate', 1)
+            moon_info = get_gate_insights(moon_gate)
+            st.markdown("### 🌙 Emotional Undercurrent")
+            st.markdown(f"**Gate {moon_gate} - {moon_info['name']}**")
+            st.write(f"The Moon brings an emotional flavor of *{moon_info['theme'].lower()}* today. You may notice feelings and moods around this theme.")
         
         with col2:
-            if 'analysis' in st.session_state:
-                st.markdown("### Transit Impact on Your Chart")
+            st.markdown("### 🌟 Collective Field Today")
+            if new_gates:
+                st.info(f"**{', '.join(map(str, sorted(new_gates)))}**")
+                st.write("These gates aren't in your natal chart but are active in the collective. You may encounter these energies through others.")
                 
-                natal_gates = set(st.session_state['analysis'].get('all_gates', []))
-                transit_gate_nums = set()
-                
-                for planet, data in transit['gates'].items():
-                    transit_gate_nums.add(data['gate'])
-                
-                activating = transit_gate_nums & natal_gates
-                new_gates = transit_gate_nums - natal_gates
-                
-                if activating:
-                    st.markdown("**🔥 Activating Your Gates:**")
-                    st.write(", ".join(map(str, sorted(activating))))
-                
-                if new_gates:
-                    st.markdown("**🌟 New Gates (Not in Natal):**")
-                    st.write(", ".join(map(str, sorted(new_gates))))
+                for gate in list(new_gates)[:2]:
+                    gate_info = get_gate_insights(gate)
+                    with st.expander(f"Gate {gate} - {gate_info['name']} (Collective)"):
+                        st.write(gate_info['description'])
             else:
-                st.info("💡 Calculate your natal chart first to see how transits affect you personally.")
+                st.success("All transit gates are in your chart today - you're aligned with the collective energy!")
+            
+            st.markdown("---")
+            
+            # Mercury insight (communication)
+            mercury_data = transit['gates'].get('Mercury', {})
+            mercury_gate = mercury_data.get('gate', 1)
+            mercury_info = get_gate_insights(mercury_gate)
+            st.markdown("### 💬 Communication Theme")
+            st.markdown(f"**Gate {mercury_gate} - {mercury_info['name']}**")
+            st.write(f"Mercury in Gate {mercury_gate} influences how ideas flow today. Conversations may center around *{mercury_info['theme'].lower()}*.")
+        
+        st.markdown("---")
+        
+        # Type-specific guidance
+        st.markdown(f"## 🧘 Today's Practice for {hd_type}s")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### 🌅 Morning Intention")
+            morning = get_transit_morning_practice(hd_type, sun_gate, activating)
+            st.markdown(f'<div class="practice-box">{morning}</div>', unsafe_allow_html=True)
+            
+            st.markdown("### 🎯 Focus for Today")
+            focus = get_transit_focus(hd_type, analysis['authority'], sun_gate)
+            st.info(focus)
+        
+        with col2:
+            st.markdown("### ⚠️ Watch Out For")
+            not_self = get_not_self_guidance(hd_type)
+            warning = get_transit_warning(hd_type, new_gates, not_self)
+            st.markdown(f'<div class="warning-box">{warning}</div>', unsafe_allow_html=True)
+            
+            st.markdown("### 🌙 Evening Reflection")
+            evening = get_transit_evening_question(hd_type, analysis['authority'], activating)
+            st.success(evening)
+    
+    else:
+        st.markdown("---")
+        st.info("💡 **Calculate your natal chart first** to see personalized transit insights!")
+        st.markdown("Go to 'Calculate Chart' to enter your birth data, then return here for daily guidance tailored to your design.")
+    
+    st.markdown("---")
+    
+    # Always show the transit table
+    st.markdown("### 📊 All Current Planetary Positions")
+    transit_data = create_gate_table(transit['gates'])
+    st.dataframe(
+        pd.DataFrame(transit_data)[['Planet', 'Gate.Line', 'Longitude']],
+        hide_index=True,
+        use_container_width=True
+    )
 
 # Footer
 st.markdown("---")
