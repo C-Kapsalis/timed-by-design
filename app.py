@@ -620,10 +620,21 @@ else:
                         st.markdown("**Gift:**")
                         st.write(channel_info['gift'])
 
-# Footer
+# Footer with disclaimer
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: #9ca3af; padding: 0.5rem; font-size: 0.8rem;">
-    Human Design Calculator · Built with Swiss Ephemeris
+<div style="text-align: center; color: #6b7280; padding: 1rem; font-size: 0.85rem; line-height: 1.6;">
+    <p style="margin-bottom: 0.5rem;">
+        Human Design was originated by Ra Uru Hu. This calculator is for experimentation only.
+    </p>
+    <p style="margin-bottom: 0.5rem;">
+        For official Human Design resources and professional analysis, visit 
+        <a href="https://jovianarchive.com?bg_ref=RtTvFyHAV5" target="_blank" style="color: #3b82f6; text-decoration: underline;">
+            Jovian Archive
+        </a>
+    </p>
+    <p style="color: #9ca3af; font-size: 0.75rem;">
+        Chart calculations powered by Swiss Ephemeris
+    </p>
 </div>
 """, unsafe_allow_html=True)
