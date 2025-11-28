@@ -54,48 +54,48 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Custom CSS - Light, minimal, readable
+# Custom CSS - Clean light theme with good contrast
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    .stApp {
-        background-color: #ffffff;
+    /* Force light background everywhere */
+    .stApp, .main, [data-testid="stAppViewContainer"] {
+        background-color: #ffffff !important;
     }
     
+    /* Header styling */
     .main-header {
-        font-family: 'Inter', sans-serif;
-        font-size: 2.2rem;
+        font-size: 2rem;
         font-weight: 700;
         text-align: center;
-        margin-bottom: 0.3rem;
-        color: #1a1a1a;
+        margin-bottom: 0.25rem;
+        color: #111827 !important;
     }
     
     .sub-header {
-        font-family: 'Inter', sans-serif;
         font-size: 1rem;
         text-align: center;
-        color: #666666;
+        color: #6b7280 !important;
         margin-bottom: 1.5rem;
     }
     
+    /* Type cards - keep colored backgrounds with white text */
     .type-card {
-        padding: 1rem;
+        padding: 0.75rem;
         border-radius: 8px;
         text-align: center;
-        color: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     .type-card p {
-        color: white !important;
+        color: #ffffff !important;
+        margin: 0 !important;
     }
     
+    /* Summary row */
     .summary-row {
         display: flex;
         justify-content: center;
-        gap: 2rem;
+        gap: 3rem;
         margin: 1rem 0;
         flex-wrap: wrap;
     }
@@ -105,134 +105,144 @@ st.markdown("""
     }
     
     .summary-label {
-        font-size: 0.75rem;
-        color: #888;
+        font-size: 0.7rem;
+        color: #9ca3af !important;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
     
     .summary-value {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
-        color: #1a1a1a;
+        color: #111827 !important;
     }
     
+    /* Practice/info boxes with DARK TEXT */
     .practice-box {
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
+        background: #f0fdf4 !important;
+        border: 1px solid #86efac;
         padding: 1rem;
         border-radius: 8px;
         margin: 0.5rem 0;
-        color: #166534;
+        color: #14532d !important;
+    }
+    
+    .practice-box strong {
+        color: #14532d !important;
     }
     
     .warning-box {
-        background: #fffbeb;
-        border: 1px solid #fde68a;
+        background: #fefce8 !important;
+        border: 1px solid #fde047;
         padding: 1rem;
         border-radius: 8px;
         margin: 0.5rem 0;
-        color: #92400e;
+        color: #713f12 !important;
+    }
+    
+    .warning-box strong {
+        color: #713f12 !important;
     }
     
     .info-box {
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
+        background: #eff6ff !important;
+        border: 1px solid #93c5fd;
         padding: 1rem;
         border-radius: 8px;
         margin: 0.5rem 0;
-        color: #1e40af;
+        color: #1e3a8a !important;
     }
     
-    .gate-item {
-        background: #f8f9fa;
-        border: 1px solid #e5e7eb;
-        padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-        margin: 0.25rem 0;
-        color: #374151;
-        cursor: pointer;
+    .info-box strong {
+        color: #1e3a8a !important;
     }
     
-    .gate-item:hover {
-        background: #f3f4f6;
-    }
-    
-    .gate-number {
-        font-weight: 600;
-        color: #1a1a1a;
-    }
-    
-    .gate-name {
-        color: #4b5563;
-    }
-    
-    .gate-theme {
-        font-style: italic;
-        color: #6b7280;
-        font-size: 0.9em;
-    }
-    
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
+    /* Transit header boxes */
     .transit-header {
-        background: #f9fafb;
+        background: #f9fafb !important;
         padding: 1rem;
         border-radius: 8px;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
         border: 1px solid #e5e7eb;
     }
     
     .transit-planet {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        color: #1a1a1a;
+        color: #111827 !important;
     }
     
     .transit-desc {
-        color: #4b5563;
+        color: #4b5563 !important;
         font-size: 0.9rem;
         margin-top: 0.25rem;
     }
     
-    /* Fix tab text colors */
-    .stTabs [data-baseweb="tab"] {
-        color: #1a1a1a;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        color: #1a1a1a;
+    /* Section titles */
+    .section-title {
+        font-size: 1rem;
         font-weight: 600;
+        color: #111827 !important;
+        margin-bottom: 0.5rem;
     }
     
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        font-size: 0.95rem;
-        color: #374151;
-    }
-    
-    /* Make sure all text is readable */
-    p, li, span {
-        color: #374151;
+    /* Force all text to be dark */
+    p, span, li, div {
+        color: #374151 !important;
     }
     
     h1, h2, h3, h4, h5, h6 {
-        color: #1a1a1a;
+        color: #111827 !important;
+    }
+    
+    /* But keep white text in colored cards */
+    .type-card * {
+        color: #ffffff !important;
+    }
+    
+    /* Streamlit specific overrides */
+    .stMarkdown, .stText {
+        color: #374151 !important;
+    }
+    
+    [data-testid="stMarkdownContainer"] p {
+        color: #374151 !important;
+    }
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #ffffff !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        color: #374151 !important;
+    }
+    
+    /* Expanders */
+    .streamlit-expanderHeader {
+        color: #111827 !important;
+        background-color: #f9fafb !important;
+    }
+    
+    .streamlit-expanderContent {
+        background-color: #ffffff !important;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        color: #374151 !important;
     }
     
     /* Compact layout */
     .block-container {
         padding-top: 1rem;
         padding-bottom: 1rem;
-        max-width: 1200px;
+        max-width: 1100px;
+    }
+    
+    /* Remove dark header bar */
+    header[data-testid="stHeader"] {
+        background-color: #ffffff !important;
     }
 </style>
 """, unsafe_allow_html=True)

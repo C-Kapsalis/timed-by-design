@@ -695,6 +695,7 @@ CHANNEL_INSIGHTS = {
 
 def get_channel_insights(channel):
     return CHANNEL_INSIGHTS.get(channel, {
+        "name": f"Channel {channel}",
         "description": "This channel connects two centers, creating defined energy.",
         "gift": "This channel provides consistent, reliable energy in this area of life.",
         "shadow": "The shadow is the distorted expression when not living correctly."
