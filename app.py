@@ -613,10 +613,12 @@ else:
             st.markdown("### Your Channels")
             for channel in analysis['defined_channels']:
                 channel_info = get_channel_insights(channel)
-                with st.expander(f"**Channel {channel}** — {channel_info['name']}"):
-                    st.write(channel_info['description'])
-                    st.markdown("**Gift:**")
-                    st.write(channel_info['gift'])
+                channel_name = channel_info.get('name', f'Channel {channel}')
+                with st.expander(f"**Channel {channel}** — {channel_name}"):
+                    st.write(channel_info.get('description', 'This channel connects two centers.'))
+                    if 'gift' in channel_info:
+                        st.markdown("**Gift:**")
+                        st.write(channel_info['gift'])
 
 # Footer
 st.markdown("---")
