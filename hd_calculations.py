@@ -191,9 +191,24 @@ def calculate_gates(positions):
     return gates
 
 def geocode_location(location_str):
+    """
+    Geocode a location string to get coordinates and timezone.
+    Uses Nominatim with proper headers and retry logic.
+    """
+    import time
+    
     try:
-        geolocator = Nominatim(user_agent="human_design_app")
-        location = geolocator.geocode(location_str)
+        # Use a more specific user agent to avoid blocks
+        geolocator = Nominatim(
+            user_agent="HumanDesignCalculator/1.0 (Educational Project)",
+            timeout=10
+        )
+        
+        # Add a small delay to respect rate limits
+        time.sleep(1)
+        
+        location = geolocator.geocode(location_str, language='en')
+        
         if location:
             tf = TimezoneFinder()
             timezone_str = tf.timezone_at(lat=location.latitude, lng=location.longitude)
@@ -203,9 +218,91 @@ def geocode_location(location_str):
                 'address': location.address,
                 'timezone': timezone_str or 'UTC'
             }
+        else:
+            # Try with just the city name if full string fails
+            if ',' in location_str:
+                city = location_str.split(',')[0].strip()
+                time.sleep(1)
+                location = geolocator.geocode(city, language='en')
+                if location:
+                    tf = TimezoneFinder()
+                    timezone_str = tf.timezone_at(lat=location.latitude, lng=location.longitude)
+                    return {
+                        'latitude': location.latitude,
+                        'longitude': location.longitude,
+                        'address': location.address,
+                        'timezone': timezone_str or 'UTC'
+                    }
     except Exception as e:
         print(f"Geocoding error: {e}")
+    
     return None
+
+
+# Common locations lookup table for faster results
+COMMON_LOCATIONS = {
+    "agrinio": {"lat": 38.6216, "lon": 21.4083, "tz": "Europe/Athens", "address": "Agrinio, Greece"},
+    "agrinio, greece": {"lat": 38.6216, "lon": 21.4083, "tz": "Europe/Athens", "address": "Agrinio, Greece"},
+    "athens": {"lat": 37.9838, "lon": 23.7275, "tz": "Europe/Athens", "address": "Athens, Greece"},
+    "athens, greece": {"lat": 37.9838, "lon": 23.7275, "tz": "Europe/Athens", "address": "Athens, Greece"},
+    "new york": {"lat": 40.7128, "lon": -74.0060, "tz": "America/New_York", "address": "New York, USA"},
+    "new york, usa": {"lat": 40.7128, "lon": -74.0060, "tz": "America/New_York", "address": "New York, USA"},
+    "london": {"lat": 51.5074, "lon": -0.1278, "tz": "Europe/London", "address": "London, UK"},
+    "london, uk": {"lat": 51.5074, "lon": -0.1278, "tz": "Europe/London", "address": "London, UK"},
+    "los angeles": {"lat": 34.0522, "lon": -118.2437, "tz": "America/Los_Angeles", "address": "Los Angeles, USA"},
+    "paris": {"lat": 48.8566, "lon": 2.3522, "tz": "Europe/Paris", "address": "Paris, France"},
+    "berlin": {"lat": 52.5200, "lon": 13.4050, "tz": "Europe/Berlin", "address": "Berlin, Germany"},
+    "tokyo": {"lat": 35.6762, "lon": 139.6503, "tz": "Asia/Tokyo", "address": "Tokyo, Japan"},
+    "sydney": {"lat": -33.8688, "lon": 151.2093, "tz": "Australia/Sydney", "address": "Sydney, Australia"},
+    "toronto": {"lat": 43.6532, "lon": -79.3832, "tz": "America/Toronto", "address": "Toronto, Canada"},
+    "chicago": {"lat": 41.8781, "lon": -87.6298, "tz": "America/Chicago", "address": "Chicago, USA"},
+    "miami": {"lat": 25.7617, "lon": -80.1918, "tz": "America/New_York", "address": "Miami, USA"},
+    "san francisco": {"lat": 37.7749, "lon": -122.4194, "tz": "America/Los_Angeles", "address": "San Francisco, USA"},
+    "seattle": {"lat": 47.6062, "lon": -122.3321, "tz": "America/Los_Angeles", "address": "Seattle, USA"},
+    "boston": {"lat": 42.3601, "lon": -71.0589, "tz": "America/New_York", "address": "Boston, USA"},
+    "denver": {"lat": 39.7392, "lon": -104.9903, "tz": "America/Denver", "address": "Denver, USA"},
+    "phoenix": {"lat": 33.4484, "lon": -112.0740, "tz": "America/Phoenix", "address": "Phoenix, USA"},
+    "amsterdam": {"lat": 52.3676, "lon": 4.9041, "tz": "Europe/Amsterdam", "address": "Amsterdam, Netherlands"},
+    "rome": {"lat": 41.9028, "lon": 12.4964, "tz": "Europe/Rome", "address": "Rome, Italy"},
+    "madrid": {"lat": 40.4168, "lon": -3.7038, "tz": "Europe/Madrid", "address": "Madrid, Spain"},
+    "barcelona": {"lat": 41.3851, "lon": 2.1734, "tz": "Europe/Madrid", "address": "Barcelona, Spain"},
+    "munich": {"lat": 48.1351, "lon": 11.5820, "tz": "Europe/Berlin", "address": "Munich, Germany"},
+    "vienna": {"lat": 48.2082, "lon": 16.3738, "tz": "Europe/Vienna", "address": "Vienna, Austria"},
+    "zurich": {"lat": 47.3769, "lon": 8.5417, "tz": "Europe/Zurich", "address": "Zurich, Switzerland"},
+    "moscow": {"lat": 55.7558, "lon": 37.6173, "tz": "Europe/Moscow", "address": "Moscow, Russia"},
+    "dubai": {"lat": 25.2048, "lon": 55.2708, "tz": "Asia/Dubai", "address": "Dubai, UAE"},
+    "singapore": {"lat": 1.3521, "lon": 103.8198, "tz": "Asia/Singapore", "address": "Singapore"},
+    "hong kong": {"lat": 22.3193, "lon": 114.1694, "tz": "Asia/Hong_Kong", "address": "Hong Kong"},
+    "seoul": {"lat": 37.5665, "lon": 126.9780, "tz": "Asia/Seoul", "address": "Seoul, South Korea"},
+    "mumbai": {"lat": 19.0760, "lon": 72.8777, "tz": "Asia/Kolkata", "address": "Mumbai, India"},
+    "delhi": {"lat": 28.7041, "lon": 77.1025, "tz": "Asia/Kolkata", "address": "Delhi, India"},
+    "melbourne": {"lat": -37.8136, "lon": 144.9631, "tz": "Australia/Melbourne", "address": "Melbourne, Australia"},
+    "auckland": {"lat": -36.8509, "lon": 174.7645, "tz": "Pacific/Auckland", "address": "Auckland, New Zealand"},
+    "cape town": {"lat": -33.9249, "lon": 18.4241, "tz": "Africa/Johannesburg", "address": "Cape Town, South Africa"},
+    "cairo": {"lat": 30.0444, "lon": 31.2357, "tz": "Africa/Cairo", "address": "Cairo, Egypt"},
+    "mexico city": {"lat": 19.4326, "lon": -99.1332, "tz": "America/Mexico_City", "address": "Mexico City, Mexico"},
+    "sao paulo": {"lat": -23.5505, "lon": -46.6333, "tz": "America/Sao_Paulo", "address": "São Paulo, Brazil"},
+    "buenos aires": {"lat": -34.6037, "lon": -58.3816, "tz": "America/Argentina/Buenos_Aires", "address": "Buenos Aires, Argentina"},
+}
+
+
+def geocode_location_with_fallback(location_str):
+    """
+    Try common locations first, then fall back to geocoding API.
+    """
+    # Check common locations first (instant, no API call)
+    location_lower = location_str.lower().strip()
+    if location_lower in COMMON_LOCATIONS:
+        loc = COMMON_LOCATIONS[location_lower]
+        return {
+            'latitude': loc['lat'],
+            'longitude': loc['lon'],
+            'address': loc['address'],
+            'timezone': loc['tz']
+        }
+    
+    # Try geocoding API
+    return geocode_location(location_str)
 
 def calculate_natal_chart(birth_datetime, timezone_str='UTC'):
     jd_birth = datetime_to_julian(birth_datetime, timezone_str)

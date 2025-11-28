@@ -11,7 +11,7 @@ import pandas as pd
 from hd_calculations import (
     calculate_natal_chart,
     calculate_transit_chart,
-    geocode_location,
+    geocode_location_with_fallback,
     get_profile_name
 )
 from hd_bodygraph import (
@@ -201,17 +201,49 @@ if page == "📊 Calculate Chart":
             help="Enter city and country for accurate timezone"
         )
         
+        location_data = None
+        
         if location_input:
             with st.spinner("🔍 Looking up location..."):
-                location_data = geocode_location(location_input)
+                location_data = geocode_location_with_fallback(location_input)
                 if location_data:
                     st.success(f"✅ {location_data['address']}")
                     st.caption(f"🌍 Timezone: {location_data['timezone']}")
                 else:
-                    st.warning("⚠️ Location not found. Please try a different format.")
-                    location_data = None
-        else:
-            location_data = None
+                    st.warning("⚠️ Location not found via lookup. Please select timezone manually below.")
+        
+        # Manual timezone fallback
+        if not location_data or st.checkbox("Select timezone manually", value=(location_input and not location_data)):
+            common_timezones = [
+                'UTC',
+                'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+                'America/Toronto', 'America/Mexico_City', 'America/Sao_Paulo',
+                'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Rome', 'Europe/Madrid',
+                'Europe/Athens', 'Europe/Moscow',
+                'Asia/Dubai', 'Asia/Kolkata', 'Asia/Singapore', 'Asia/Tokyo', 'Asia/Seoul', 'Asia/Shanghai',
+                'Australia/Sydney', 'Australia/Melbourne',
+                'Pacific/Auckland',
+                'Africa/Cairo', 'Africa/Johannesburg'
+            ]
+            
+            # Default to Europe/Athens for Greek locations
+            default_idx = 0
+            if location_input and 'greece' in location_input.lower():
+                default_idx = common_timezones.index('Europe/Athens') if 'Europe/Athens' in common_timezones else 0
+            
+            manual_tz = st.selectbox(
+                "Select your birth timezone",
+                options=common_timezones,
+                index=default_idx,
+                help="Select the timezone where you were born"
+            )
+            
+            location_data = {
+                'latitude': 0,
+                'longitude': 0,
+                'address': location_input or 'Manual Entry',
+                'timezone': manual_tz
+            }
     
     st.markdown("---")
     
